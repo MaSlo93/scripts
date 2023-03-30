@@ -1,4 +1,3 @@
-// Matúš s.r.o.
 //prva funkcia vytiahnuť healthbary
 //druha funkcia skontrolovať hp
 //tretia samostatné liečenie
@@ -23,7 +22,7 @@ var config = {
 
 
 		
-function VytiahniHealthbary()
+function healthbars()
 {
 	var friends = Orion.GetFriendList();
 	var x = 10;
@@ -37,7 +36,7 @@ function VytiahniHealthbary()
 
 
 
-function CheckniHp()
+function CheckHp()
 {
 var friends = Orion.GetFriendList();
 for (i in friends)
@@ -178,7 +177,7 @@ for (i in friends) //otočí každého frienda
 
 
 
-function Ustajnenie()
+function toStable()
 {
 var friends = Orion.GetFriendList(); //list friendov
 var target = Orion.FindObject(friends);
