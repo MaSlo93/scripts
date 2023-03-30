@@ -1,0 +1,209 @@
+// Matúš s.r.o.
+//prva funkcia vytiahnuť healthbary
+//druha funkcia skontrolovať hp
+//tretia samostatné liečenie
+	//Skript lieči živé zvieratá, nerressuje mrtvé
+	//Na začiatok si treba hodiť petov do Lists - Friends - New - Select by target 
+	//funguje automatický pre hocijaký počet petov
+	//V config si určuješ či si zavoláš peta k sebe (false) alebo či dobehneš 
+	//sám k ním (true)
+//piata je ress, zvierata volá k sebe, ressne a vyhealuje do plna
+//šiesta je ustajnenie v krone aby si to nemusel klikať ručne
+// verzia 10.12.2022 opravená funkcia ress, mala by už fungovať správne, zle zátvorky...
+// doplneny dialog pri ustajňovaní zvierat
+
+
+var config = {
+	"follow"  	:  true, //true follow, false volá musí za tym byť čiarka!!!
+	"Mesto"  	:  true //true Kron, false Silden
+	
+};
+
+
+
+
+		
+function VytiahniHealthbary()
+{
+	var friends = Orion.GetFriendList();
+	var x = 10;
+	for (friend in friends)
+	{
+
+	Orion.ShowStatusbar( friends[friend] , x, 10)
+	x += 154;
+	}
+}
+
+
+
+function CheckniHp()
+{
+var friends = Orion.GetFriendList();
+for (i in friends)
+	{
+	var target = Orion.FindObject(friends[i]);
+	var percent =(target.Hits() / target.MaxHits())*100;
+	var hp = target.Hits();
+	Orion.Print(0x15, target.Name()  +" " + percent+"%")
+	}		
+} 
+
+
+
+function Heal()
+
+{
+var friends = Orion.GetFriendList(); //list friendov
+for (i in friends) //otočí každého frienda
+
+	{
+
+	var target = Orion.FindObject(friends[i]);
+	var percent = (target.Hits() / target.MaxHits()*100);
+	while ( percent < 90 && target.Hits() > 0) // ak ma pet menej ako 90 hp cykluje cez petov v poradí friendslistu
+		{
+			if (target.Hits() === target.MaxHits()  )  // prerušenie liečenia peta ak ma full hp
+			 {
+			  Orion.Print(0x45,target.Name() +" je zdravé");
+			  Orion.Wait("500");
+			 break;
+			 }
+			else 
+			{
+				if (target.Distance() < 2) // heal ak je pet v dosahu bandy
+				{
+				var target = Orion.FindObject(friends[i]);
+				Orion.UseType(0x0E21);
+				Orion.Wait("500");
+				Orion.TargetObject(friends[i]);
+				Orion.Print(0x35,"Liečim "+target.Name());
+				Orion.Wait("3000");
+				}
+
+				else // či si za zvieraťom postava dôjde alebo zavolá
+				{
+					if (config['follow'])// dojde samo za petom, da cas na vyliecenie
+					{
+					// vymaž //ak chceš aby postava došla za zvieraťom
+					Orion.Print(0x25,"Ďaleko na heal "+target.Name());
+					Orion.Follow(friends[i]); //ak chceš ísť sam 
+					Orion.Wait("2000");
+					}
+					else // volá zviera
+					{
+				
+						Orion.Say(target.Name() + " follow me");
+						Orion.Wait("2000");
+					}
+				}
+			}
+
+		} 
+	
+	}
+ Orion.Print(0x45,"Zvieratá sú zdravé " )
+ Orion.Wait("500");
+}
+
+
+
+
+function ress()
+
+{
+var friends = Orion.GetFriendList(); //list friendov
+var target = Orion.FindObject(friends);
+for (i in friends) //otočí každého frienda
+
+	{
+	
+	var hlaska = Orion.InJournal("si schopen"); // aby fungovala funkcia na odklik gumpu
+	var target = Orion.FindObject(friends[i]);
+	var percent = (target.Hits() / target.MaxHits()*100); // percenta hp, asi najskôr vymazať
+	while (target.Hits() === 0) // ak je pet mrtvy
+		{
+			var hlaska = Orion.InJournal("si schopen"); // aby fungovala funkcia na odklik gumpu
+			if (target.Hits() === target.MaxHits()  )  // prerušenie cyklu  
+			 {
+			  Orion.Print(0x45,target.Name() +" je oživené");
+			  Orion.Print("2 " );
+			 break; //asi zmeniť na healuje
+			 }
+			else 
+			{
+				
+					if (hlaska !=null) //  automatické odkliknutie gumpu
+						{
+						Orion.ClearJournal();
+						var gump1 = Orion.GetGump('last');
+						if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0xC180BA61'))
+							{
+							gump1.Select(Orion.CreateGumpHook(1));
+							Orion.Wait(100);
+							}
+						Orion.Print(0x35,"zviera ressnuté");
+						Orion.ClearJournal();
+						Orion.Wait("500");
+						}
+						if (target.Distance() >= 2) //ak je pet dalej tak si ho zavolá
+						{
+							Orion.Say(target.Name() + " follow me");
+							Orion.Wait("2000"); //čaká na peta, každé 2s sa pokúsi o ress znova
+						}
+						else 
+						{
+							if (target.Distance() < 2) // ress ak je pet v dosahu bandy
+							{
+								var target = Orion.FindObject(friends[i]);
+								Orion.UseType(0x0E21);
+								Orion.Wait("500");
+								Orion.TargetObject(friends[i]);
+								Orion.Print(0x35,"Hádžem bandu");
+								Orion.Wait("3000");
+							}
+
+							else // 
+							{
+								Orion.Print(0x35,"skúšam znova");
+								Orion.Wait("1000");
+							} 
+						} 
+			} 
+		}
+
+	}
+	Orion.Print(0x45,"Zvieratá sú živé a zdravé " )
+}
+
+
+
+function Ustajnenie()
+{
+var friends = Orion.GetFriendList(); //list friendov
+var target = Orion.FindObject(friends);
+for (i in friends) //otočí každého frienda
+	{
+	
+	if(config['Mesto']) //výber mesta
+		{
+		Orion.RequestContextMenu('0x0000344F'); //true Kron
+		Orion.WaitContextMenuID('0x0000344F', 1);
+		if (Orion.WaitForTarget(1000))
+		Orion.Print(0x35,'Zviera menom ' + Orion.FindObject(friends[i]).Name() + ' je ustajnenené');
+		Orion.TargetObject(friends[i]);
+		
+		}
+		else
+		{
+		Orion.RequestContextMenu('0x000004A0'); //false Silden
+		Orion.WaitContextMenuID('0x000004A0', 1);
+		if (Orion.WaitForTarget(1000))
+		Orion.Print(0x35,'Zviera menom ' + Orion.FindObject(friends[i]).Name() + ' je ustajnenené');
+		Orion.TargetObject(friends[i]);
+		}
+	}
+	Orion.Print(0x45,'Zvieratá ustajnené!');
+}
+		
+			
