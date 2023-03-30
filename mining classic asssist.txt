@@ -1,0 +1,258 @@
+# Mining script OU Classicassist Dvorana
+# v.3.2
+# Funkcia mine zrýchlena, fail výroby už nezastaví makro
+# Doplnený výber AFK kontroly pri spustení
+# v.3.1
+# Opravené vypínanie a zapínanie funkcií (banka, afk, mástroje)
+# v.3
+# Odkladá do banky, AFK kontrola
+# v.2
+# Vyrába nástroje
+# v.1
+# aží, taví
+# Pred zaèatím kopania si napísa X a Y kde aži
+# Rozhodnú sa èo bude robi
+# Matúš
+
+"""players decisions"""
+# 0 nevyrába, 1 vyrába pickaxe a tinktools
+robNastroje = 1 
+
+# 0 nehádže do banky, 1 áno
+doBanky = 1
+
+afkKontrola = ConfirmPrompt("Chceš AFK kontrolu?")
+"""changing variables"""
+#zmeni po reštarte servera
+tinkeringGump = 0x82386b29
+
+
+"""defined variables"""
+maxZataz =460
+
+minepoints = [
+[270,3991],
+[270,3990],
+[271,3992],
+[271,3991],
+[271,3990],
+[271,3989],
+[271,3988],
+[271,3987],
+[271,3986],
+[271,3985],
+[272,3984],
+[272,3986],
+[272,3987],
+[272,3988],
+[272,3989],
+[272,3990],
+[272,3991],
+[272,3992],
+[272,3993],
+[272,3994],
+[272,3995],
+[272,3996],
+[273,3997],
+[273,3996],
+[273,3995],
+[273,3994],
+[273,3993],
+[273,3992],
+[273,3991],
+[273,3990],
+[273,3989],
+[273,3988],
+[273,3987],
+[273,3986],
+[273,3985],
+[273,3984],
+[273,3983],
+[273,3982],
+[273,3981],
+[274,3980],
+[274,3981],
+[274,3982],
+[274,3984],
+[274,3985],
+[274,3987],
+[274,3988],
+[274,3989],
+[274,3990],
+[274,3991],
+[274,3993],
+[274,3994],
+[274,3995],
+[274,3996],
+[274,3997],
+[274,3998],
+[274,3999],
+[275,3999],
+[275,3998],
+[275,3997],
+[275,3996],
+[275,3995],
+[275,3994],
+[275,3993],
+[275,3991],
+[275,3990],
+[275,3989],
+[275,3988],
+[276,3989],
+[276,3990],
+[276,3991],
+[276,3992],
+[276,3993],
+[276,3995],
+[276,3996],
+[276,3997],
+[276,3998],
+[276,3999],
+[277,3999],
+[277,3998],
+[277,3997],
+[277,3996],
+[277,3995],
+[277,3994],
+[277,3993],
+[277,3992],
+[277,3991],
+[277,3990],
+]      
+
+"""defined methods"""
+
+def resolveEmptyHands():
+    if InJournal("nástroj je již"):
+        if robNastroje:
+            SysMessage("Kontrolujem nástroje...", 40)
+            makeTools()
+            Pause(300)
+        EquipType(0xe86, "OneHanded")
+        Pause(1000)
+        ClearJournal()
+    if InJournal("annot find"):
+        if robNastroje:
+            SysMessage("Kontrolujem nástroje...", 40)
+            makeTools()
+            Pause(300)
+        EquipType(0xe86, "OneHanded")
+        Pause(1000)
+        ClearJournal()
+
+def AFK():
+    res = ConfirmPrompt("Si pri pc?")
+    if res:
+        SysMessage("Pokraèujeme", 66)
+    else:
+        SysMessage("Aj tak Pokraèujeme", 66)
+            
+
+def kontrola():
+    Pause(100)
+    x = CountType(0x1bf2, "backpack", 0)
+    if x > 500 and x < 550:
+        AFK()
+    if x > 1000 and x < 1050:
+        AFK()
+    if x > 1500 and x < 1550:
+        AFK()
+    if x > 2000 and x < 2040:
+        AFK()
+    if x > 2500 and x < 2520:
+        AFK()
+
+def moveToBank():
+    if CountType(0x1bf2, "backpack", 0)> 2600:
+        SysMessage("Odkladám...", 69)
+        Pause(1000)
+        Msg(".abi 2")
+        Pause(1000)
+        while FindType(0x1bf2, -1, "backpack"):
+            MoveType(0x1bf2, "backpack", "bank",-1,-1,-1,-1,-1)
+            Pause(1000)
+        MoveType(0x1bf2, "bank", "backpack",-1,-1,-1,0,12)
+        Pause(1000)
+
+def makeTinkTool():
+    UseType(0x1eb8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 23)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 0)
+
+def makePickaxe():
+    UseType(0x1eb8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 114)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 0)
+
+def makeTools():
+    pickaxeCount = CountType(0xe86, "backpack")
+    tinkToolsCount = CountType(0x1eb8, "backpack")
+    if pickaxeCount < 1:
+        if tinkToolsCount < 2:
+            makeTinkTool()
+            Pause(300)
+            makePickaxe()
+            SysMessage("Vyrobený pickaxe a tinkertools.", 25)
+        else:
+            makePickaxe()
+            SysMessage("Vyrobený pickaxe.", 25)
+    else:
+        Pause(300)
+        SysMessage("Nevyrábam niè.", 25)
+        Pause(300)
+
+def walkto(x,y,z):
+    Pathfind(x, y, z)
+    Pause(500)
+    while Pathfinding():
+        Pause(100)
+
+def mine():
+    ClearJournal()
+    while not InJournal("tu není"):
+        UseLayer("OneHanded")
+        WaitForTarget(1000)
+        TargetXYZ(X("self"), Y("self"), 0)
+        WaitForJournal(["tu není", "jsi trochu", "uvolnil jsi"], 1500, "system")
+        resolveEmptyHands()
+        if Weight() > maxZataz:
+            smelt()
+        
+def smelt():
+    walkto(275, 3986, 0)
+    Pause(300)
+    SysMessage("Tavím...", 40)
+    while FindType(0x19b9, -1, "backpack"):
+        UseType(0x19b9)
+        WaitForTarget(5000)
+        Pause(300)
+        Target(0x4000e8b7)
+        Pause(2000)
+    if doBanky:
+        moveToBank()
+        Pause(300)
+    if afkKontrola:
+        kontrola()
+        Pause(300)
+    walkto(minepoints[i][0],minepoints[i][1],0)
+ 
+"""execution of methods""" 
+while 1:
+    for i in range(len(minepoints)):
+        SysMessage("Políèko " + str(i+1),40)
+        walkto(minepoints[i][0],minepoints[i][1],0)
+        mine()
