@@ -1,0 +1,460 @@
+//vyrába tear kite shield
+//berie zákazky a ukladá do banky
+//dorobiť funkciu na nosenie penazi do banky
+
+function Moneymaker()
+{
+init()
+
+while(!Player.Dead())
+	{
+	zakazkySilden();
+	Orion.Wait('300');
+	makelast();
+	Orion.Wait('300');
+	vratkladivo();
+	Orion.Wait('300');
+	predaj();
+	Orion.Wait('1000');	
+	zlatky();
+	Orion.Wait('300');
+	vylozPrachy();
+	Orion.Wait('300');
+	otvorTruhlicku();
+	Orion.Wait('300');
+	zoberMatros();
+	Orion.Wait('300');	
+} 
+}
+
+function init()
+{
+Orion.Print(0x35, "Začínam s výrobou");
+otvorTruhlicku();
+Orion.Wait('300');
+zoberMatros();
+Orion.Wait('300');
+}
+
+function zoberMatros()
+{
+var ingots = Orion.FindType('0x1BF2', -1, 'backpack', 'item|fast|recurse');
+	if (ingots.length === 0)
+		{
+		ingoty();
+		Orion.Wait('300');
+		}
+var kladivo = Orion.FindType('0x13E3', -1, 'backpack', 'item|fast|recurse');
+	if (kladivo.length === 0)
+		{
+		
+		porieskladivo();
+		Orion.Wait('300');
+		}
+		
+}
+
+function makelast()
+{
+var ingots = Orion.FindType('0x1BF2', -1, 'backpack', 'item|fast|recurse');
+while(ingots.length > 0)
+	{
+		
+		var ingots = Orion.FindType('0x1BF2', -1, 'backpack', 'item|fast|recurse');
+		if (ingots.length === 0)
+		{
+		break
+		}
+		var kladivo = Orion.FindType('0x13E3', -1, 'backpack', 'item|fast|recurse');
+		if (kladivo.length === 0)
+		{
+		kupKladivo()
+		}
+	Orion.UseType('0x13E3', '0xFFFF');
+	Orion.Wait(300);
+	if (Orion.WaitForGump(1000))
+	{
+		var gump0 = Orion.GetGump('last');
+		if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0xC791AE28'))
+		{
+			gump0.Select(Orion.CreateGumpHook(29));
+			Orion.Wait(300);
+		}
+	}
+	if (Orion.WaitForGump(1000))
+	{
+		var gump1 = Orion.GetGump('last');
+		if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0xC791AE28'))
+		{
+			gump1.Select(Orion.CreateGumpHook(37));
+			Orion.Wait(5000);
+		}
+	}
+	if (Orion.WaitForGump(1000))
+	{
+		var gump2 = Orion.GetGump('last');
+		if ((gump2 !== null) && (!gump2.Replayed()) && (gump2.ID() === '0xC791AE28'))
+		{
+			gump2.Select(Orion.CreateGumpHook(0));
+			Orion.Wait(300);
+		}
+	}
+	}//while
+	}//func
+
+function porieskladivo()
+{
+
+var findItems0 = Orion.FindType('0x13E3', '0xFFFF', '0x4004F1D6', 'item|fast|recurse');
+if (findItems0.length === 0)
+{
+kupKladivo()
+}
+
+var findItems0 = Orion.FindType('0x13E3', '0xFFFF', '0x4004F1D6', 'item|fast|recurse');
+if(findItems0.length != 0)
+{
+kladivo()
+}
+
+}
+
+function kladivo()// vyberie kladivo z truhly
+{
+		var findItems0 = Orion.FindType('0x13E3', '0xFFFF', '0x4004F1D6', 'item|fast|recurse');
+		if (findItems0.length)
+		{
+			Orion.DragItem(findItems0[0], 1);
+			Orion.Wait('300');
+		}
+		Orion.DropDraggedItem('0x40059F47', 124, 124);
+		Orion.Wait('500');
+}
+
+function kupKladivo()
+{
+	Orion.RequestContextMenu('0x00001655');
+	Orion.WaitContextMenuID('0x00001655', 1);
+	if (Orion.WaitForGump(1000))
+	{
+		var gump0 = Orion.GetGump('last');
+		if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x099FA907'))
+		{
+			gump0.Select(Orion.CreateGumpHook(2));
+			Orion.Wait(500);
+		}
+	}
+	if (Orion.WaitForGump(1000))
+	{
+		var gump1 = Orion.GetGump('last');
+		if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0x099FA907'))
+		{
+			gump1.Select(Orion.CreateGumpHook(2));
+			Orion.Wait(500);
+		}
+	}
+	if (Orion.WaitForGump(1000))
+	{
+		var gump2 = Orion.GetGump('last');
+		if ((gump2 !== null) && (!gump2.Replayed()) && (gump2.ID() === '0x099FA907'))
+		{
+			gump2.Select(Orion.CreateGumpHook(3));
+			Orion.Wait(1000);
+		}
+	}
+	if (Orion.WaitForGump(1000))
+	{
+		var gump3 = Orion.GetGump('last');
+		if ((gump3 !== null) && (!gump3.Replayed()) && (gump3.ID() === '0x2192FB07'))
+		{
+			gump3.Select(Orion.CreateGumpHook(1));
+			Orion.Wait(1000);
+		}
+	}
+	if (Orion.WaitForGump(1000))
+	{
+		var gump4 = Orion.GetGump('last');
+		if ((gump4 !== null) && (!gump4.Replayed()) && (gump4.ID() === '0x099FA907'))
+		{
+			gump4.Select(Orion.CreateGumpHook(0));
+			Orion.Wait(500);
+		}
+	}
+}
+
+
+
+function vratkladivo()
+{
+
+	var findItems0 = Orion.FindType('0x13E3', '0xFFFF', 'backpack', 'item|fast|recurse');
+	if (findItems0.length)
+	{
+		Orion.DragItem(findItems0[0], 1);
+		Orion.Wait('300');
+	}
+	Orion.DropDraggedItem('0x4004F1D6');
+	Orion.Wait('500');
+}
+
+function ingoty()
+{
+	var findItems0 = Orion.FindType('0x1BF2', '0xFFFF', '0x4004F1D6', 'item|fast|recurse');
+	Orion.Wait('1000');
+	if (findItems0.length)
+	{
+		Orion.DragItem(findItems0[0], 400);
+		Orion.Wait('1000');
+	}
+	Orion.DropDraggedItem('0x40059F47', 124, 124);
+	Orion.Wait('1000');
+
+}
+
+function predaj()
+{
+	Orion.RequestContextMenu('0x00001655');
+	Orion.WaitContextMenuID('0x00001655', 2);
+	if (Orion.WaitForGump(1000))
+	{
+		var gump0 = Orion.GetGump('last');
+		if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0xA79D33EC'))
+		{
+			gump0.Select(Orion.CreateGumpHook(3));
+			Orion.Wait(300);
+		}
+	}
+}
+
+function zlatky()
+{
+	var findItems0 = Orion.FindType('0x0EED', '0xFFFF', 'backpack', 'item|fast|recurse');
+	if (findItems0.length)
+	{
+		Orion.DragItem(findItems0[0], 0);
+		Orion.Wait('300');
+	}
+	Orion.DropDraggedItem('0x4004F1D6');
+	Orion.Wait('500');
+}
+
+function zakazkySilden()
+{
+zakazkySildenKrejc();
+Orion.Wait(1000);
+zakazkySildenKrejcV();
+Orion.Wait(1000);
+zakazkySildenBS();
+Orion.Wait(1000);
+zakazkySildenBSV();
+Orion.Wait(1000);
+zakKovDoKnihy();
+Orion.Wait(500);
+zakKrajDoKnihy();
+Orion.Wait(500);
+}
+
+function zakazkySildenKrejc()
+{
+	Orion.RequestContextMenu('0x0000164E');
+	Orion.WaitContextMenuID('0x0000164E', 3);
+	if (Orion.WaitForGump(1500))
+	{
+		var gump0 = Orion.GetGump('last');
+		if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x1B4BAD03'))
+		{
+			gump0.Select(Orion.CreateGumpHook(1));
+			Orion.Wait(1000);
+		}
+	}
+}
+
+function zakazkySildenKrejcV()
+{
+	Orion.RequestContextMenu('0x0000164E');
+	Orion.WaitContextMenuID('0x0000164E', 3);
+	if (Orion.WaitForGump(1500))
+	{
+		var gump0 = Orion.GetGump('last');
+		if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x02B547C7'))
+		{
+			var gumpHook0 = Orion.CreateGumpHook(2);
+			gumpHook0.AddEntry(3, "");
+			gump0.Select(gumpHook0);
+			Orion.Wait(500);
+		}
+	}
+	if (Orion.WaitForGump(500))
+	{
+		var gump1 = Orion.GetGump('last');
+		if ((gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0xE1E92AE5'))
+		{
+			gump1.Select(Orion.CreateGumpHook(1));
+			Orion.Wait(500);
+		}
+	}
+}
+
+function zakazkySildenBS()
+{
+Orion.RequestContextMenu('0x00001655');
+	Orion.WaitContextMenuID('0x00001655', 3);
+	if (Orion.WaitForGump(1500))
+	{
+		var gump1 = Orion.GetGump('last');
+		if (true)
+		{
+			gump1.Select(Orion.CreateGumpHook(1));
+			Orion.Wait(1000);
+			//(gump1 !== null) && (!gump1.Replayed()) && (gump1.ID() === '0x1B4BAD03'
+		}
+	}
+}
+
+function zakazkySildenBSV()
+{
+	Orion.RequestContextMenu('0x00001655');
+	Orion.WaitContextMenuID('0x00001655', 3);
+	if (Orion.WaitForGump(1500))
+	{
+		var gump0 = Orion.GetGump('last');
+		//(gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x02B547C7')
+		if (true)
+		{
+			var gumpHook0 = Orion.CreateGumpHook(2);
+			gumpHook0.AddEntry(3, "");
+			gump0.Select(gumpHook0);
+			Orion.Wait(500);
+		}
+	}
+	if (Orion.WaitForGump(500))
+	{
+		var gump1 = Orion.GetGump('last');
+		if (true)
+		{
+			gump1.Select(Orion.CreateGumpHook(1));
+			Orion.Wait(500);
+		}
+	}
+}
+
+function zakKrajDoKnihy()
+{
+	var findItems0 = Orion.FindType('0x2258', '0x0483', 'backpack', 'item|fast|recurse');
+	if (true)
+	{
+		Orion.DragItem(findItems0[0], 1);
+		Orion.Wait('300');
+	}
+	Orion.DropDraggedItem('0x4002FDE4');
+	Orion.Wait('500');
+	if (Orion.WaitForGump(1000))
+	{
+		var gump0 = Orion.GetGump('last');
+		if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x047D8B82'))
+		{
+			gump0.Select(Orion.CreateGumpHook(0));
+			Orion.Wait(500);
+		}
+	}
+}
+
+function otvorTruhlicku()
+{
+	Orion.UseObject('0x4004F1D6');
+}
+
+function zakKovDoKnihy()
+{
+	var findItems0 = Orion.FindType('0x2258', '0x044E', 'backpack', 'item|fast|recurse');
+	if (true)
+	{
+		Orion.DragItem(findItems0[0], 1);
+		Orion.Wait('300');
+	}
+	Orion.DropDraggedItem('0x4002FBDC');
+	Orion.Wait('500');
+	if (Orion.WaitForGump(1000))
+	{
+		var gump0 = Orion.GetGump('last');
+		if ((gump0 !== null) && (!gump0.Replayed()) && (gump0.ID() === '0x047D8B82'))
+		{
+			gump0.Select(Orion.CreateGumpHook(0));
+			Orion.Wait(500);
+		}
+	}
+}
+
+function vylozPrachy()
+{
+var zlatky = Orion.FindType('0x0EED', '0xFFFF', '0x4004F1D6', 'item|fast|recurse');
+var pocet = Orion.Count('0x0EED', '0xFFFF', '0x4004F1D6');
+if (pocet>19000)
+{
+xyz();
+}
+else
+{
+Orion.Print("malo prachov");
+}
+}
+
+function xyz()
+{
+	Orion.Print(0x35, "Choď ku kovadline");
+	Orion.WalkTo(2537,1828,0,1);
+	Orion.UseObject('0x4004F1D6');
+	Orion.Wait(1500);
+	prachy();
+	Orion.WalkTo(2538,1834,0,1);
+	Orion.Wait(500);
+	Orion.OpenDoor();
+	Orion.Wait(500);
+	Orion.WalkTo(2526,1833,0,1);
+	Orion.Wait(500);
+	Orion.OpenDoor();
+	Orion.Wait(500);
+	Orion.WalkTo(2526,1829,0);
+	Orion.Wait(1500);
+	bank();
+	Orion.WalkTo(2526,1833,0,1);
+	Orion.Wait(500);
+	Orion.OpenDoor();
+	Orion.Wait(500);
+	Orion.WalkTo(2538,1834,0,1);
+	Orion.Wait(500);
+	Orion.OpenDoor();
+	Orion.Wait(500);
+	Orion.WalkTo(2537,1829,0,0);
+	Orion.Wait(500);
+}
+
+function prachy()
+{
+	var findItems0 = Orion.FindType('0x0EED', '0xFFFF', '0x4004F1D6', 'item|fast|recurse');
+	if (true)
+	{
+		Orion.DragItem(findItems0[0], 19000);
+		Orion.Wait('300');
+	}
+	Orion.DropDraggedItem('0x40059F47', 75, 65);
+	Orion.Wait('500');
+}
+
+
+function bank()
+{
+Orion.Say("Banku, prosim");
+Orion.Wait(2000);
+var banka = Player.BankSerial();
+var findItems0 = Orion.FindType('0x0EED', '0xFFFF', 
+'backpack', 'item|fast|recurse');
+	if (true)
+	{
+		Orion.DragItem(findItems0[0], 19000);
+		Orion.Wait('300');
+	}
+	Orion.DropDraggedItem(banka);
+	Orion.Wait('500');
+}
+
