@@ -1,29 +1,29 @@
-# Mining script OU Classicassist Dvorana
+# Mining script OU Classicassist Dvorana, Python
 # v.3.2
-# Funkcia mine zrýchlena, fail výroby už nezastaví makro
-# Doplnený výber AFK kontroly pri spustení
+# Funkcia mine zrÃ½chlena, fail vÃ½roby uÅ¾ nezastavÃ­ Skript
+# DoplnenÃ½ vÃ½ber AFK kontroly pri spustenÃ­
 # v.3.1
-# Opravené vypínanie a zapínanie funkcií (banka, afk, mástroje)
+# OpravenÃ© vypÃ­nanie a zapÃ­nanie funkciÃ­ (banka, afk, mÃ¡stroje)
 # v.3
-# Odkladá do banky, AFK kontrola
+# OdkladÃ¡ do banky, AFK kontrola
 # v.2
-# Vyrába nástroje
+# VyrÃ¡ba nÃ¡stroje
 # v.1
-# aží, taví
-# Pred zaèatím kopania si napísa X a Y kde aži
-# Rozhodnú sa èo bude robi
-# Matúš
+# ÂaÅ¾Ã­, tavÃ­
+# Pred zaÃ¨atÃ­m kopania si napÃ­saÂ X a Y kde ÂaÅ¾iÂ
+# RozhodnÃºÂ sa Ã¨o bude robiÂ
+# MatÃºÅ¡
 
 """players decisions"""
-# 0 nevyrába, 1 vyrába pickaxe a tinktools
+# 0 nevyrÃ¡ba, 1 vyrÃ¡ba pickaxe a tinktools
 robNastroje = 1 
 
-# 0 nehádže do banky, 1 áno
+# 0 nehÃ¡dÅ¾e do banky, 1 Ã¡no
 doBanky = 1
 
-afkKontrola = ConfirmPrompt("Chceš AFK kontrolu?")
+afkKontrola = ConfirmPrompt("ChceÅ¡ AFK kontrolu?")
 """changing variables"""
-#zmeni po reštarte servera
+#zmeniÂ po reÅ¡tarte servera
 tinkeringGump = 0x82386b29
 
 
@@ -123,9 +123,9 @@ minepoints = [
 """defined methods"""
 
 def resolveEmptyHands():
-    if InJournal("nástroj je již"):
+    if InJournal("nÃ¡stroj je jiÅ¾"):
         if robNastroje:
-            SysMessage("Kontrolujem nástroje...", 40)
+            SysMessage("Kontrolujem nÃ¡stroje...", 40)
             makeTools()
             Pause(300)
         EquipType(0xe86, "OneHanded")
@@ -133,7 +133,7 @@ def resolveEmptyHands():
         ClearJournal()
     if InJournal("annot find"):
         if robNastroje:
-            SysMessage("Kontrolujem nástroje...", 40)
+            SysMessage("Kontrolujem nÃ¡stroje...", 40)
             makeTools()
             Pause(300)
         EquipType(0xe86, "OneHanded")
@@ -143,9 +143,9 @@ def resolveEmptyHands():
 def AFK():
     res = ConfirmPrompt("Si pri pc?")
     if res:
-        SysMessage("Pokraèujeme", 66)
+        SysMessage("PokraÃ¨ujeme", 66)
     else:
-        SysMessage("Aj tak Pokraèujeme", 66)
+        SysMessage("Aj tak PokraÃ¨ujeme", 66)
             
 
 def kontrola():
@@ -164,7 +164,7 @@ def kontrola():
 
 def moveToBank():
     if CountType(0x1bf2, "backpack", 0)> 2600:
-        SysMessage("Odkladám...", 69)
+        SysMessage("OdkladÃ¡m...", 69)
         Pause(1000)
         Msg(".abi 2")
         Pause(1000)
@@ -206,13 +206,13 @@ def makeTools():
             makeTinkTool()
             Pause(300)
             makePickaxe()
-            SysMessage("Vyrobený pickaxe a tinkertools.", 25)
+            SysMessage("VyrobenÃ½ pickaxe a tinkertools.", 25)
         else:
             makePickaxe()
-            SysMessage("Vyrobený pickaxe.", 25)
+            SysMessage("VyrobenÃ½ pickaxe.", 25)
     else:
         Pause(300)
-        SysMessage("Nevyrábam niè.", 25)
+        SysMessage("NevyrÃ¡bam niÃ¨.", 25)
         Pause(300)
 
 def walkto(x,y,z):
@@ -223,11 +223,11 @@ def walkto(x,y,z):
 
 def mine():
     ClearJournal()
-    while not InJournal("tu není"):
+    while not InJournal("tu nenÃ­"):
         UseLayer("OneHanded")
         WaitForTarget(1000)
         TargetXYZ(X("self"), Y("self"), 0)
-        WaitForJournal(["tu není", "jsi trochu", "uvolnil jsi"], 1500, "system")
+        WaitForJournal(["tu nenÃ­", "jsi trochu", "uvolnil jsi"], 1500, "system")
         resolveEmptyHands()
         if Weight() > maxZataz:
             smelt()
@@ -235,7 +235,7 @@ def mine():
 def smelt():
     walkto(275, 3986, 0)
     Pause(300)
-    SysMessage("Tavím...", 40)
+    SysMessage("TavÃ­m...", 40)
     while FindType(0x19b9, -1, "backpack"):
         UseType(0x19b9)
         WaitForTarget(5000)
@@ -253,6 +253,6 @@ def smelt():
 """execution of methods""" 
 while 1:
     for i in range(len(minepoints)):
-        SysMessage("Políèko " + str(i+1),40)
+        SysMessage("PolÃ­Ã¨ko " + str(i+1),40)
         walkto(minepoints[i][0],minepoints[i][1],0)
         mine()
