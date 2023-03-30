@@ -1,0 +1,211 @@
+# Lumberjacking script OU Classicassist Dvorana, Jazyk Python
+# v.1
+# Skript s·m ùaûÌ, vyr·ba sekery, tinktooly,
+# robÌ z polien dosky, po dosiahnutÌ urËitÈho
+# poËtu dosiek ich hodÌ do banky.
+# S integrovanou AFK kontrolou.
+# Mat˙ö
+
+"""changing variables"""
+#zmeniù po reötarte servera
+tinkeringGump = 0x64ea4b91
+
+"""players decisions"""
+# 0 nevyr·ba, 1 vyr·ba pickaxe a tinktools
+toolMaking = 1 
+
+# 0 neh·dûe do banky, 1 ·no
+bankMoving = 1
+
+# 0 nekontroluje, 1 ·no
+afkChecking = 0
+
+"""defined variables"""
+# najlepöie maxweight -20
+maxZataz =450
+
+
+#pole na v˝chod vedæa stromu!
+lumberPoints = [
+[1183,1724],
+[1177,1722],
+[1175,1723],
+[1175,1727],
+[1170,1729],
+[1166,1731],
+[1160,1730],
+[1158,1732],
+[1157,1737],
+[1154,1742],
+[1151,1740],
+[1150,1732],
+[1148,1735],
+[1144,1744],
+[1140,1744],
+[1141,1739],
+[1139,1735],
+[1139,1738],
+[1138,1743],
+[1135,1745],
+[1129,1746],
+[1130,1743],
+[1131,1736],
+[1130,1735],
+[1128,1741],
+[1126,1743],
+[1125,1745],
+[1123,1741],
+[1121,1745],
+[1120,1747],
+[1105,1744],
+[1099,1760],
+]      
+
+"""defined methods"""
+
+# VyhodÌ gump na kontrolu, ktor˝ treba odlikn˙t
+def checkAfkGump():
+    res = ConfirmPrompt("si pri pc?")
+    if res:
+        SysMessage("PokraËujeme", 66)
+    else:
+        SysMessage("Aj tak PokraËujeme", 66)
+            
+# Pri akom poËte dosiek zkontroluje hr·Ëa
+def checkAfk():
+    Pause(100)
+    x = CountType(0x1bd7, "backpack", 0)
+    if x > 500 and x < 550:
+        checkAfkGump()
+    if x > 1000 and x < 1050:
+        checkAfkGump()
+    if x > 1500 and x < 1550:
+        checkAfkGump()
+    if x > 2000 and x < 2050:
+        AFK()
+    if x > 2500 and x < 2550:
+        checkAfkGump()
+        
+def makeTinkTool():
+    UseType(0x1eb8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(500)
+    ReplyGump(tinkeringGump, 8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(500)
+    ReplyGump(tinkeringGump, 23)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(500)
+    ReplyGump(tinkeringGump, 0)
+    Pause(500)
+
+def makeAxe():
+    UseType(0x1eb8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(500)
+    ReplyGump(tinkeringGump, 8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(500)
+    ReplyGump(tinkeringGump, 30)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(500)
+    ReplyGump(tinkeringGump, 0)
+    Pause(500)
+    
+def makeTools():
+    axeCount = CountType(0xf43, "backpack")
+    Pause(300)
+    tinkToolsCount = CountType(0x1eb8, "backpack")
+    Pause(300)
+    if axeCount < 1:
+        Pause(300)
+        if tinkToolsCount < 2:
+            Pause(300)
+            makeTinkTool()
+            Pause(300)
+            makeAxe()
+            Pause(300)
+            SysMessage("Vyroben˝ pickaxe a tinkertools.", 25)
+            Pause(300)
+        else:
+            makeAxe()
+            Pause(300)
+            SysMessage("Vyroben˝ pickaxe.", 25)
+            Pause(300)
+    else:
+        Pause(300)
+        SysMessage("Nevyr·bam niË.", 25)
+        Pause(300)
+
+def walkto(x,y,z):
+    Pathfind(x, y, z)
+    Pause(500)
+    while Pathfinding():
+        Pause(500)
+
+def moveStuffBank():
+    if CountType(0x1bd7, "backpack", 0)> 3000:
+        Pause(1000)
+        Msg("bank") #zmeniù neskÙr na abi 2 
+        Pause(1000)
+        while FindType(0x1bd7, -1, "backpack"):
+            MoveType(0x1bd7, "backpack", "bank",-1,-1,-1,-1,-1)
+            Pause(1000)
+        MoveType(0x1bf2, "backpack", "bank",-1,-1,-1,0,-1)
+        Pause(1000)  
+        MoveType(0x1bf2, "bank", "backpack",-1,-1,-1,0,200)
+        Pause(1000)        
+
+def makePlanks():
+    while FindType(0x1bdd, -1, "backpack"):
+        Pause(100)
+        UseLayer("TwoHanded")
+        WaitForTarget(1000)
+        Pause(100)
+        TargetType(0x1bdd)
+    if toolMaking:
+        makeTools()
+        Pause(150)
+    if bankMoving:
+        moveStuffBank()
+        Pause(150)
+    if afkChecking:
+        checkAfk()
+        Pause(150)        
+
+def lumberjack():
+    ClearJournal()
+    while not InJournal("tu nenÌ"):
+        UseLayer("TwoHanded")
+        WaitForTarget(1000)
+        Pause(100)
+        TargetTileOffsetResource(-1, 0, 0)
+        Pause(3000)
+        if InJournal("Na to nem"):
+            break 
+            # Ak pathfind zblbne
+        if InJournal("Cannot find item"):
+            EquipType(0xf43, "TwoHanded")
+            Pause(500) 
+            # NahodÌ sekeru ak s˙ ruky pr·zdne
+            # a je v batohu
+        if InJournal("ZniËil jsi sekeru"):
+            EquipType(0xf43, "TwoHanded")
+            Pause(500)
+            ClearJournal()
+    makePlanks()
+
+def mainProcess():
+    while 1:
+        for i in range(len(lumberPoints)):
+            SysMessage("Strom " + str(i+1),40)
+            walkto(lumberPoints[i][0],lumberPoints[i][1],0)
+            lumberjack()
+
+def init():
+    SysMessage("Starting...",35)
+    mainProcess()
+
+"""execution of methods"""
+
+init()

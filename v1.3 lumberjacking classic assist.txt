@@ -1,0 +1,422 @@
+# Lumberjacking script OU Classicassist Dvorana, Jazyk Python
+# v.1.3 Pridané robenie dosiek pod¾a výšky skillu
+# Do 95% carpentry vzácne dreva vyhadzuje
+# Nad 95% odkladá
+# v.1.2 Matúšove lucídne ponocovanie
+# Robenie dosiek pod¾a hue driev
+# Polená, ktoré nedokáže naseka vyhodí
+# skript zrýchlený
+# v.1.1
+# Doplnená funkcia štartu z ¾ubovo¾ného stromu.
+# v.1
+# Skript sám aží, vyrába sekery, tinktooly,
+# robí z polien dosky, po dosiahnutí urèitého
+# poètu dosiek ich hodí do banky.
+# S integrovanou AFK kontrolou.
+# Matúš
+
+"""changing variables"""
+#zmeni po reštarte servera
+tinkeringGump = 0x5da72d83
+
+"""players decisions"""
+# Z ktorého stromu štartova, 1 je prvý
+startTileCfg = 1
+# 0 nevyrába, 1 vyrába pickaxe a tinktools
+toolMaking = 1 
+# 0 nehádže do banky, 1 áno
+bankMoving = 1
+# 0 nekontroluje AFK, 1 áno
+afkChecking = 0
+# 0 ak máš skill pod 95, 1 ak viac
+highLumberSkill = 1
+"""defined variables"""
+# najlepšie maxweight -20
+maxZataz =510
+
+doskyHodina = 4100
+
+uselessWoodHue =[
+[1721, "Javor"],
+[2213, "Borovica"],
+[1338, "Modrín"],
+[983, "Èernín"],
+[2115, "Krvavý strom"],
+[2127, "Drevo bažín"],
+]
+
+usefulWoodHue = [
+[2312, "Dub"], #min skill 65
+[0, "Normálne drevo"],#min skill 0
+]
+
+#pole na východ ved¾a stromu!
+lumberPoints = [
+[1099,1760],
+[1094,1758],
+[1094,1757],
+[1091,1756],
+[1091,1753],
+[1086,1752],
+[1087,1764],
+[1073,1770],
+[1071,1770],
+[1065,1770],
+[1061,1772],
+[1060,1776],
+[1057,1777],
+[1056,1772],
+[1059,1768],
+[1056,1765],
+[1055,1762],
+[1050,1762],
+[1050,1763],
+[1048,1765],
+[1035,1768],#odtia¾ znova prepísa vetva
+[1034,1765],
+[1034,1764],
+[1035,1762],
+[1034,1761],
+[1028,1762],
+[1029,1765],
+[1027,1769],
+[1024,1771],
+[1019,1772],
+[1014,1776],
+[1017,1779],
+[1012,1784],
+[1012,1790],
+[1010,1790],
+[1007,1791],
+[1004,1796],
+[1002,1798],
+[997,1801],
+[1001,1803],
+[1007,1803],
+[1013,1805],
+[1017,1810],
+[1016,1817],
+[1014,1817],
+[1006,1819],
+[1004,1817],
+[1002,1816],
+[1003,1814],
+[1001,1814],
+[994,1813],
+[992,1814],
+[992,1820],
+[991,1826],
+[983,1836],#potia¾ ïalšia vetva
+[980,1840],
+[979,1848],
+[981,1849],
+[973,1858],
+[967,1852],
+[965,1583],
+[957,1855],
+[956,1856],
+[950,1858],
+[946,1867],
+[947,1870],
+[949,1868],
+[951,1867],
+[953,1870],
+[954,1868],
+[954,1867],
+[958,1868],
+[956,1866],
+[955,1865],
+[955,1864],
+[961,1864],
+[958,1861],
+[960,1859],
+[958,1858],
+[962,1858],
+[965,1860],
+[967,1859],
+[968,1864],
+[967,1866],
+[971,1869],
+[965,1880],
+[962,1889],
+[957,1895],
+[945,1898],
+[940,1904],
+[936,1915],
+[936,1923],
+[938,1925],
+[939,1922],
+[938,1919],
+[941,1915],
+[943,1913],
+[943,1916],
+[945,1925],
+[946,1926],
+[948,1925],
+[945,1916],
+[948,1915],
+[950,1915],
+[952,1912],
+[955,1916],
+[955,1915],
+[957,1912],
+[957,1909],
+[959,1906],
+[954,1902],
+[959,1897],
+[962,1893],
+[964,1894],
+[967,1888],
+[967,1886],
+[966,1885],
+[969,1883],
+[973,1872],
+[974,1870],
+[974,1863],
+[977,1863],
+[979,1863],
+[983,1860],
+[985,1850],
+[985,1840],
+[991,1842],
+[991,1845],
+[991,1849],
+[994,1844],
+[999,1845],
+[1002,1844],
+[1009,1845],
+[1008,1846],
+[1013,1843],
+[1017,1846],
+[1017,1842],
+[1022,1838],
+[1028,1836],
+[1030,1836],
+[1032,1836],
+[1035,1833],
+[1035,1830],
+[1038,1825],
+[1042,1822],
+[1045,1816],
+[1042,1810],
+[1042,1809],
+[1045,1802],
+[1049,1797],
+[1049,1793],
+[1054,1788],
+[1057,1784],
+[1060,1776],
+[1065,1776],
+[1070,1774],
+[1071,1780],
+[1075,1776],
+[1076,1775],
+[1082,1770],
+[1082,1773],
+[1080,1774],
+[1080,1778],
+[1083,1781],
+[1084,1782],
+[1089,1783],
+[1096,1781],
+[1100,1780],
+[1097,1776],
+[1098,1775],
+[1096,1771],
+[1091,1779],
+[1090,1778],
+[1089,1779],
+[1088,1781],
+[1086,1779],
+[1083,1778],
+[1084,1775],
+[1085,1772],
+[1088,1769],
+[1089,1766],
+[1089,1764],
+[1092,1768],
+[1095,1766],
+]      
+
+"""defined methods"""
+def throwOutUselessWood():
+    for index in range(len(uselessWoodHue)):
+        if FindType(0x1bdd, -1, "backpack", uselessWoodHue[index][0]): 
+            MoveTypeOffset(0x1bdd, "backpack", 0, 1, 0, -1,uselessWoodHue[index][0])
+            Pause(600)
+            SysMessage("Throwing out "+uselessWoodHue[index][1], 56)
+
+
+# Vyhodí gump na kontrolu, ktorý treba odliknút
+def checkAfkGump():
+    res = ConfirmPrompt("si pri pc?")
+    if res:
+        SysMessage("Pokraèujeme", 66)
+    else:
+        SysMessage("Aj tak Pokraèujeme", 66)
+            
+# Pri akom poète dosiek zkontroluje hráèa
+def checkAfk():
+    Pause(100)
+    x = CountType(0x1bd7, "backpack", 0)
+    if x > 500 and x < 550:
+        checkAfkGump()
+    if x > 1000 and x < 1050:
+        checkAfkGump()
+    if x > 1500 and x < 1540:
+        checkAfkGump()
+    if x > 2000 and x < 2030:
+        AFK()
+    if x > 2500 and x < 2525:
+        checkAfkGump()
+        
+def makeTinkTool():
+    UseType(0x1eb8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 23)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 0)
+    Pause(150)
+
+def makeAxe():
+    UseType(0x1eb8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 8)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 30)
+    WaitForGump(tinkeringGump, 5000)
+    Pause(150)
+    ReplyGump(tinkeringGump, 0)
+    Pause(150)
+    
+def makeTools():
+    axeCount = CountType(0xf43, "backpack")
+    Pause(150)
+    tinkToolsCount = CountType(0x1eb8, "backpack")
+    Pause(150)
+    if axeCount < 1:
+        Pause(150)
+        if tinkToolsCount < 2:
+            Pause(150)
+            makeTinkTool()
+            Pause(150)
+            makeAxe()
+            Pause(150)
+            SysMessage("Vyrobený axe a tinkertools.", 25)
+            Pause(600)
+        else:
+            makeAxe()
+            Pause(150)
+            SysMessage("Vyrobený axe.", 25)
+            Pause(600)
+    else:
+        Pause(150)
+        SysMessage("Nevyrábam niè.", 25)
+        Pause(150)
+
+def walkto(x,y,z):
+    Pathfind(x, y, z)
+    Pause(500)
+    while Pathfinding():
+        Pause(100)
+
+def moveStuffBank():
+    if CountType(0x1bd7, "backpack", 0)> doskyHodina:
+        Pause(150)
+        Msg(".abi 2") #zmeni neskôr na abi 2 
+        Pause(1000)
+        while FindType(0x1bd7, -1, "backpack"):
+            MoveType(0x1bd7, "backpack", "bank",-1,-1,-1,-1,-1)
+            Pause(600)
+        if not highLumberSkill:
+            while FindType(0x1bdd, -1, "backpack"):
+                MoveType(0x1bdd, "backpack", "bank",-1,-1,-1,-1,-1)
+                Pause(600)        
+        MoveType(0x1bf2, "backpack", "bank",-1,-1,-1,0,-1)
+        Pause(600)  
+        MoveType(0x1bf2, "bank", "backpack",-1,-1,-1,0,80)
+        Pause(600)        
+
+def makePlanks():
+    if not highLumberSkill:
+        for x in range(len(usefulWoodHue)):
+            if FindType(0x1bdd, 0, "backpack", usefulWoodHue[x][0]):
+                Pause(150)
+                UseLayer("TwoHanded")
+                WaitForTarget(600)
+                Pause(150)
+                TargetType(0x1bdd, usefulWoodHue[x][0])
+                Pause(150)
+                SysMessage("Sekám "+str(usefulWoodHue[x][1])+" na dosky.",40)
+            Pause(100)
+    else:
+        while FindType(0x1bdd, -1, "backpack"):
+            Pause(100)
+            UseLayer("TwoHanded")
+            WaitForTarget(1000)
+            Pause(600)
+            TargetType(0x1bdd)
+    if bankMoving:
+        moveStuffBank()
+        Pause(150)
+    if afkChecking:
+        checkAfk()
+        Pause(150)        
+
+def lumberjack():
+    ClearJournal()
+    while not InJournal("tu není"):
+        UseLayer("TwoHanded")
+        WaitForTarget(600)
+        TargetTileOffsetResource(-1, 0, 0)
+        WaitForJournal(["Cannot find item","sekeru","tu není", "ložil sis", "ale nejsi schop","to nem"], 5000)
+        if InJournal("Na to nem"):
+            break
+            ClearJournal()
+            # Ak pathfind zblbne
+        if InJournal("Cannot find item"):
+            if toolMaking:
+                makeTools()
+                Pause(300)
+            EquipType(0xf43, "TwoHanded")
+            Pause(600) 
+            ClearJournal()
+            # Nahodí sekeru ak sú ruky prázdne
+            # a je v batohu
+        if InJournal("sekeru"):
+            SysMessage("666",666)
+            if toolMaking:
+                makeTools()
+                Pause(300)
+            EquipType(0xf43, "TwoHanded")
+            Pause(600)
+            ClearJournal()
+    Pause(500)
+    makePlanks()
+    if not highLumberSkill:
+        if Weight() > maxZataz:
+            throwOutUselessWood()
+
+
+def mainProcess():
+    while 1:
+        startTile = startTileCfg - 1
+        for i in range(len(lumberPoints)):
+            if i>=startTile:
+                walkto(lumberPoints[i][0],lumberPoints[i][1],0)
+                SysMessage("Strom " + str(i+1),40)
+                lumberjack()
+
+def init():
+    SysMessage("Starting...",35)
+    mainProcess()
+
+"""execution of methods"""
+init()
